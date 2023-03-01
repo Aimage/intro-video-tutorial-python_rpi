@@ -6,6 +6,8 @@ import twilio.jwt.access_token.grants
 import twilio.rest
 from dotenv import load_dotenv
 from flask import Flask, render_template, request
+from rpi_join import RpiJoinThread
+from threading import Event
 
 # Load environment variables from a .env file
 load_dotenv()
@@ -15,6 +17,10 @@ account_sid = os.environ["TWILIO_ACCOUNT_SID"]
 api_key = os.environ["TWILIO_API_KEY_SID"]
 api_secret = os.environ["TWILIO_API_KEY_SECRET"]
 twilio_client = twilio.rest.Client(api_key, api_secret, account_sid)
+
+# twilio_client = twilio.rest.Client(account_sid, auth_token)
+
+RPI_THREAD = None
 
 # Create a Flask app
 app = Flask(__name__)
@@ -56,8 +62,20 @@ def join_room():
     # retrieve an access token for this room
     access_token = get_access_token(room_name)
     # return the decoded access token in the response
-    return {"token": access_token.to_jwt().decode()}
+    print(access_token)
+    # return {"token": access_token.to_jwt().decode()}
+    return {"token": access_token.to_jwt()}
 
+@app.route("/join-rpi", methods=["GET", "POST"])
+def join_rpi():
+    global RPI_THREAD
+    if RPI_THREAD:
+        RPI_THREAD.event.set()
+        RPI_THREAD.join()
+        RPI_THREAD = None
+    RPI_THREAD = RpiJoinThread('myroom', Event())
+    RPI_THREAD.start()
+    return "Room joined"
 
 # Start the server when this file runs
 if __name__ == "__main__":

@@ -1,6 +1,7 @@
 const form = document.getElementById("room-name-form");
 const roomNameInput = document.getElementById("room-name-input");
 const container = document.getElementById("video-container");
+const buttonJoinRpi = document.getElementById("button-join-rpi");
 
 const startRoom = async (event) => {
   // prevent a page reload when a user submits the form
@@ -38,7 +39,8 @@ const handleConnectedParticipant = (participant) => {
   // create a div for this participant's tracks
   const participantDiv = document.createElement("div");
   participantDiv.setAttribute("id", participant.identity);
-  container.appendChild(participantDiv);
+  //container.appendChild(participantDiv);
+  container.prepend(participantDiv);
 
   // iterate through the participant's published tracks and
   // call `handleTrackPublication` on them
@@ -80,8 +82,25 @@ const joinVideoRoom = async (roomName, token) => {
   // join the video room with the Access Token and the given room name
   const room = await Twilio.Video.connect(token, {
     room: roomName,
+    audio: false,
+    video: true
   });
   return room;
 };
 
+const joinRpi = async (event) => {
+
+  const roomName = roomNameInput.value;
+  const response = await fetch("/join-rpi", {
+    method: "POST",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ room_name: roomName }),
+  });
+};
+
+
 form.addEventListener("submit", startRoom);
+buttonJoinRpi.addEventListener('click', joinRpi);
