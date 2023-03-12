@@ -2,7 +2,7 @@
   <img src="https://static0.twilio.com/marketing/bundles/marketing/img/logos/wordmark-red.svg" alt="Twilio" width="250" />
 </a>
 
-# Twilio Video JavaScript SDK Tutorial for Python
+# Twilio Video JavaScript SDK Tutorial for Python With Raspberry Pi
 
 ## About
 
